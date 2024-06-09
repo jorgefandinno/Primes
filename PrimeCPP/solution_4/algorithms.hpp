@@ -109,6 +109,16 @@ enum class DynStride {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Generic/templated sieve that can be configured to use any combination of optimizations.
 
+template<typename T>
+std::string convertToString(T a, int size) {
+    std::string s = "";
+    for (int i = 0; i < size; i++) {
+        s += std::to_string(a[i]);
+        s += " ";
+    }
+    return s;
+}
+
 template<typename Storage, std::size_t WheelSize, DynStride Stride = DynStride::OUTER, bool HalfStorage = true>
 class GenericSieve {
   public:
@@ -133,8 +143,11 @@ class GenericSieve {
 
         const auto sieveSize = m_sieveSize / (HalfStorage ? 2 : 1);
 
+        // std::cout << "Wheel: " << convertToString(WHEEL_INC,100) << std::endl;
+
         auto wheelIdx = wheel_idx_t{};
         // makeIdx allows the storage to provide an optimized index type.
+        
         for(auto i = m_bits.makeIdx(START_NUM); i * i <= sieveSize; i += strider(wheelIdx, true_v)) {
             while(!m_bits[i]) {
                 i += strider(wheelIdx, true_v);

@@ -69,6 +69,7 @@ class prime_sieve(object):
             # If marking factor 3, you wouldn't mark 6 (it's a mult of 2) so start with the 3rd instance of this factor's multiple.
             # We can then step by factor * 2 because every second one is going to be even by definition
             # the for loop to clear the bits is "hidden" in the array slicing
+            print([0] * ((this.sieveSize-factor*3+factor*2-1)//(factor*2)))
             this.rawbits[factor*3//2::factor] = [0] * ((this.sieveSize-factor*3+factor*2-1)//(factor*2))
 
             factor += 2 # No need to check evens, so skip to next odd (factor = 3, 5, 7, 9...)
