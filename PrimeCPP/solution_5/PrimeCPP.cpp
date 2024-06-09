@@ -16,6 +16,7 @@ using namespace std;
 using namespace std::chrono;
 
 class BitArray {
+public:
     uint32_t *array;
     size_t arrSize;
 
@@ -81,7 +82,7 @@ class prime_sieve
    public:
 
       prime_sieve(long n) 
-        : Bits(n), sieveSize(n)
+        : Bits(n/2), sieveSize(n)
       {
       }
 
@@ -96,33 +97,31 @@ class prime_sieve
 
           while (factor <= q)
           {
-              int num = factor;
-              while (!Bits.get(num)) num += 2;
-              factor = num;
-            //   for (int num = factor; num < sieveSize; num += 2)
-            //   {
-            //       if (Bits.get(num))
-            //       {
-            //           factor = num;
-            //           break;
-            //       }
-            //   }
-              Bits.setFlagsFalse(factor * factor, factor + factor);
-
+              int num = factor/2 - 1;
+            //   std::cout << "Bits: " << std::bitset<32>(Bits.array[0]) << std::endl;
+            //   std::cout << "Num: " << num << " :: ";
+              while (!Bits.get(num)) {
+                // std::cout << num << " ";
+                num++;
+              }
+            //   std::cout << std::endl;
+              factor = 3 + 2*num;
+            //   std::cout << "Factor:" << factor << std::endl;
+              Bits.setFlagsFalse(factor * factor/2 - 1, (factor + factor)/2);
               factor += 2;
           }
       }
 
       void printResults(double duration, int passes)
       {
+        //   std::cout << "Bits: " << std::bitset<32>(Bits.array[0]) << std::endl;
           if (showResults)
               printf("2, ");
-
           int count = (sieveSize >= 2);                             // Starting count (2 is prime)
           for (int num = 3; num <= sieveSize; num+=2)
           {
-              while (!Bits.get(num) && num <= sieveSize) num += 2;
-              if (Bits.get(num))
+              while (!Bits.get(num/2-1) && num <= sieveSize-2) num += 2;
+              if (Bits.get(num/2-1))
               {
                   if (showResults)
                       printf("%d, ", num);
@@ -151,7 +150,7 @@ class prime_sieve
       {
           int count =  (sieveSize >= 2);;
           for (int i = 3; i < sieveSize; i+=2)
-              if (Bits.get(i))
+              if (Bits.get(i/2-1))
                   count++;
           return count;
       }
@@ -181,12 +180,13 @@ int main()
 
     while (true)
     {
-        prime_sieve<ShowResults> sieve(1000000L);
+        int sieveSize = 1000000L; // 1000000L
+        prime_sieve<ShowResults> sieve(sieveSize);
         sieve.runSieve();
         passes++;
         if (duration_cast<seconds>(steady_clock::now() - tStart).count() >= 5)
         {
-            sieve.printResults(duration_cast<microseconds>(steady_clock::now() - tStart).count() / 1000000.0, passes);
+            sieve.printResults(duration_cast<microseconds>(steady_clock::now() - tStart).count() / double(sieveSize), passes);
             break;
         }
     } 
