@@ -61,6 +61,7 @@ public:
     }
 };
 
+template<bool showResults>
 class prime_sieve
 {
   private:
@@ -95,21 +96,24 @@ class prime_sieve
 
           while (factor <= q)
           {
-              for (int num = factor; num < sieveSize; num += 2)
-              {
-                  if (Bits.get(num))
-                  {
-                      factor = num;
-                      break;
-                  }
-              }
+              int num = factor;
+              while (!Bits.get(num)) num += 2;
+              factor = num;
+            //   for (int num = factor; num < sieveSize; num += 2)
+            //   {
+            //       if (Bits.get(num))
+            //       {
+            //           factor = num;
+            //           break;
+            //       }
+            //   }
               Bits.setFlagsFalse(factor * factor, factor + factor);
 
               factor += 2;
           }
       }
 
-      void printResults(bool showResults, double duration, int passes)
+      void printResults(double duration, int passes)
       {
           if (showResults)
               printf("2, ");
@@ -117,6 +121,7 @@ class prime_sieve
           int count = (sieveSize >= 2);                             // Starting count (2 is prime)
           for (int num = 3; num <= sieveSize; num+=2)
           {
+              while (!Bits.get(num) && num <= sieveSize) num += 2;
               if (Bits.get(num))
               {
                   if (showResults)
@@ -152,7 +157,10 @@ class prime_sieve
       }
 };
 
-const std::map<const long long, const int> prime_sieve::resultsDictionary =
+const bool ShowResults = false;
+
+template <bool ShowResults>
+const std::map<const long long, const int> prime_sieve<ShowResults>::resultsDictionary =
 {
     {          10LL, 4         },               // Historical data for validating our results - the number of primes
     {         100LL, 25        },               // to be found under some limit, such as 168 primes under 1000
@@ -173,12 +181,12 @@ int main()
 
     while (true)
     {
-        prime_sieve sieve(1000000L);
+        prime_sieve<ShowResults> sieve(1000000L);
         sieve.runSieve();
         passes++;
         if (duration_cast<seconds>(steady_clock::now() - tStart).count() >= 5)
         {
-            sieve.printResults(false, duration_cast<microseconds>(steady_clock::now() - tStart).count() / 1000000.0, passes);
+            sieve.printResults(duration_cast<microseconds>(steady_clock::now() - tStart).count() / 1000000.0, passes);
             break;
         }
     } 
