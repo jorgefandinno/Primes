@@ -92,23 +92,19 @@ class prime_sieve
 
       void runSieve()
       {
-          int factor = 3;
-          int q = (int) sqrt(sieveSize);
-
-          while (factor <= q)
+          int factorp = 0; // factor = 3 + 2*factorp;
+          int limit = (int) sqrt(sieveSize);
+          // factor <= limit iff factorp <= (limit-3)/2
+          limit = (limit-3)/2;
+          while (factorp <= limit)
           {
-              int num = factor/2 - 1;
-            //   std::cout << "Bits: " << std::bitset<32>(Bits.array[0]) << std::endl;
-            //   std::cout << "Num: " << num << " :: ";
-              while (!Bits.get(num)) {
-                // std::cout << num << " ";
-                num++;
+              int num = factorp;
+              while (!Bits.get(factorp)) {
+                factorp++;
               }
-            //   std::cout << std::endl;
-              factor = 3 + 2*num;
-            //   std::cout << "Factor:" << factor << std::endl;
-              Bits.setFlagsFalse(factor * factor/2 - 1, (factor + factor)/2);
-              factor += 2;
+              // factor^2-3 = 2*factorp^2 + 6*factorp + 3
+              Bits.setFlagsFalse(2*factorp*factorp + 6*factorp + 3, 3 + 2*factorp);
+              factorp++;
           }
       }
 
